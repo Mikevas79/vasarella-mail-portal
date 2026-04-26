@@ -3,8 +3,10 @@ import 'express-session';
 declare global {
   namespace Express {
     interface User {
-      id: string;
+      id: number;
       email: string;
+      domain_id: number;
+      maildir: string;
     }
 
     interface Request {
@@ -16,8 +18,10 @@ declare global {
 declare module 'express-session' {
   interface SessionData {
     user?: {
-      id: string;
+      id: number;
       email: string;
+      domain_id: number;
+      maildir: string;
     };
   }
 }

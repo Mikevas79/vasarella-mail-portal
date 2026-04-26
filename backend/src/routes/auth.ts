@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import { findUserByEmail, userWithoutPassword } from '../mocks/users';
+import { findMailUserByEmail, mailUserWithoutPassword } from '../db/mailUsers';
+import { verifyDovecotPassword } from '../utils/verifyDovecotPassword';
 
 const router = Router();
 
@@ -12,13 +12,13 @@ router.post('/login', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const user = await findUserByEmail(email);
+  const user = await findMailUserByEmail(email);
   if (!user) {
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
-  const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-  if (!passwordMatch) {
+  const verification = await verifyDovecotPassword(password, user.password);
+  if (!verification.success) {
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
@@ -26,11 +26,13 @@ router.post('/login', async (req: Request, res: Response) => {
   req.session.user = {
     id: user.id,
     email: user.email,
+    domain_id: user.domain_id,
+    maildir: user.maildir,
   };
 
   res.json({
     message: 'Login successful',
-    user: userWithoutPassword(user),
+    user: mailUserWithoutPassword(user),
   });
 });
 
