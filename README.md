@@ -93,6 +93,20 @@ vasarella-mail-portal/
 ### Health Check
 Visit http://localhost:3001/health to verify the backend is running.
 
+### Authentication Endpoints
+The backend includes session-based authentication with the following endpoints:
+
+- `POST /api/auth/login` - Log in with email and password
+- `POST /api/auth/logout` - Log out and destroy session
+- `GET /api/auth/me` - Get current authenticated user
+
+#### Mock Login Credentials (Development)
+For testing, use these credentials:
+- **Email**: `admin@vasarella.com`
+- **Password**: `password123`
+
+_These are mock credentials in memory. They will be replaced with a MySQL database in production._
+
 ## Future Features
 - User registration/login
 - Mail user management
