@@ -5,6 +5,7 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import './types/session';
 import authRoutes from './routes/auth';
+import accountRoutes from './routes/account';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,6 +35,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/account', accountRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
