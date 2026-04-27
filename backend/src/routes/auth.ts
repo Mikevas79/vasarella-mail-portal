@@ -3,6 +3,7 @@ import { findMailUserByEmail, mailUserWithoutPassword } from '../db/mailUsers';
 import { verifyDovecotPassword } from '../utils/verifyDovecotPassword';
 
 const router = Router();
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim().toLowerCase()) || [];
 
 // POST /api/auth/login
 router.post('/login', async (req: Request, res: Response) => {
@@ -23,16 +24,21 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 
   // Set user in session
+  const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
   req.session.user = {
     id: user.id,
     email: user.email,
     domain_id: user.domain_id,
     maildir: user.maildir,
+    isAdmin,
   };
 
   res.json({
     message: 'Login successful',
-    user: mailUserWithoutPassword(user),
+    user: {
+      ...mailUserWithoutPassword(user),
+      isAdmin,
+    },
   });
 });
 
@@ -52,8 +58,14 @@ router.get('/me', (req: Request, res: Response) => {
     return res.status(401).json({ error: 'Not authenticated' });
   }
 
+  const isAdmin = ADMIN_EMAILS.includes(req.session.user.email.toLowerCase());
+  const user = {
+    ...req.session.user,
+    isAdmin,
+  };
+
   res.json({
-    user: req.session.user,
+    user,
   });
 });
 

@@ -22,6 +22,7 @@ declare module 'express-session' {
       email: string;
       domain_id: number;
       maildir: string;
+      isAdmin: boolean;
     };
   }
 }

@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth'
 import { LoginForm } from './components/LoginForm'
 import { UserProfile } from './components/UserProfile'
 import { ChangePasswordForm } from './components/ChangePasswordForm'
+import { AdminPanel } from './components/AdminPanel'
 
 function App() {
   const { user, loading, error, login, logout, checkAuth } = useAuth()
@@ -21,6 +22,7 @@ function App() {
       {user ? (
         <>
           <UserProfile user={user} onLogout={logout} loading={loading} />
+          {user.isAdmin && <AdminPanel />}
           <ChangePasswordForm user={user} />
         </>
       ) : (
