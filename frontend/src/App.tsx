@@ -3,6 +3,7 @@ import './index.css'
 import { useAuth } from './hooks/useAuth'
 import { LoginForm } from './components/LoginForm'
 import { UserProfile } from './components/UserProfile'
+import { ChangePasswordForm } from './components/ChangePasswordForm'
 
 function App() {
   const { user, loading, error, login, logout, checkAuth } = useAuth()
@@ -18,7 +19,10 @@ function App() {
   return (
     <div className="container">
       {user ? (
-        <UserProfile user={user} onLogout={logout} loading={loading} />
+        <>
+          <UserProfile user={user} onLogout={logout} loading={loading} />
+          <ChangePasswordForm user={user} />
+        </>
       ) : (
         <LoginForm onLogin={login} loading={loading} error={error} />
       )}
