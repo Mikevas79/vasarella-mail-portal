@@ -4,6 +4,9 @@ export interface MailUser {
   email: string;
   password: string;
   maildir: string;
+  active?: boolean;
+  twofa_enabled?: boolean;
+  twofa_secret?: string | null;
 }
 
-export type PublicMailUser = Omit<MailUser, 'password'>;
+export type PublicMailUser = Omit<MailUser, 'password' | 'twofa_secret'>;

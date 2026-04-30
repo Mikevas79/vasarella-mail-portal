@@ -23,7 +23,9 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
     "@types/express": "^4.17.0",
+    "@types/express-session": "^1.19.0",
     "@types/node": "^20.19.39",
     "@types/qrcode": "^1.5.6",
     "tsx": "^4.0.0",

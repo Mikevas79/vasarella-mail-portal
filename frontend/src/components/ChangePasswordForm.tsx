@@ -5,7 +5,7 @@ interface ChangePasswordFormProps {
   user: User;
 }
 
-export function ChangePasswordForm({ user }: ChangePasswordFormProps) {
+export function ChangePasswordForm({ user: _user }: ChangePasswordFormProps) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
