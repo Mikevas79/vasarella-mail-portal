@@ -4,7 +4,7 @@ import { MailUser, PublicMailUser } from '../types/mailUser';
 
 export async function findMailUserByEmail(email: string): Promise<MailUser | null> {
   const [rows] = await pool.execute(
-    'SELECT id, domain_id, email, password, maildir FROM users WHERE email = ? AND active = 1 LIMIT 1',
+    'SELECT id, domain_id, email, password, maildir, twofa_enabled, twofa_secret FROM users WHERE email = ? AND active = 1 LIMIT 1',
     [email]
   );
 
@@ -14,7 +14,7 @@ export async function findMailUserByEmail(email: string): Promise<MailUser | nul
 
 export async function findMailUserById(id: number): Promise<MailUser | null> {
   const [rows] = await pool.execute(
-    'SELECT id, domain_id, email, password, maildir FROM users WHERE id = ? AND active = 1 LIMIT 1',
+    'SELECT id, domain_id, email, password, maildir, twofa_enabled, twofa_secret FROM users WHERE id = ? AND active = 1 LIMIT 1',
     [id]
   );
 

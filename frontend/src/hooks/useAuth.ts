@@ -5,7 +5,9 @@ interface UseAuthReturn {
   user: User | null;
   loading: boolean;
   error: string | null;
+  requires2fa: boolean;
   login: (email: string, password: string) => Promise<void>;
+  verify2fa: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -14,6 +16,7 @@ export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [requires2fa, setRequires2fa] = useState(false);
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
@@ -21,21 +24,54 @@ export function useAuth(): UseAuthReturn {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = (await response.json()) as AuthError;
-        setError(errorData.error || 'Login failed');
+        setError((data as AuthError).error || 'Login failed');
         return;
       }
 
-      const data = (await response.json()) as LoginResponse;
-      setUser(data.user);
+      if (data.requires2fa) {
+        setRequires2fa(true);
+        setUser(null);
+        return;
+      }
+
+      setUser((data as LoginResponse).user);
+      setRequires2fa(false);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const verify2fa = useCallback(async (code: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/auth/2fa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError((data as AuthError).error || 'Invalid 2FA code');
+        return;
+      }
+
+      setUser((data as LoginResponse).user);
+      setRequires2fa(false);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -59,6 +95,7 @@ export function useAuth(): UseAuthReturn {
       }
 
       setUser(null);
+      setRequires2fa(false);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -95,7 +132,9 @@ export function useAuth(): UseAuthReturn {
     user,
     loading,
     error,
+    requires2fa,
     login,
+    verify2fa,
     logout,
     checkAuth,
   };

@@ -7,7 +7,7 @@ import { ChangePasswordForm } from './components/ChangePasswordForm'
 import { AdminPanel } from './components/AdminPanel'
 
 function App() {
-  const { user, loading, error, login, logout, checkAuth } = useAuth()
+  const { user, loading, error, requires2fa, login, verify2fa, logout, checkAuth } = useAuth()
 
   useEffect(() => {
     checkAuth()
@@ -26,7 +26,13 @@ function App() {
           <ChangePasswordForm user={user} />
         </>
       ) : (
-        <LoginForm onLogin={login} loading={loading} error={error} />
+        <LoginForm
+          onLogin={login}
+          onVerify2fa={verify2fa}
+          requires2fa={requires2fa}
+          loading={loading}
+          error={error}
+        />
       )}
     </div>
   )

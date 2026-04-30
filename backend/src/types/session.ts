@@ -1,20 +1,5 @@
 import 'express-session';
 
-declare global {
-  namespace Express {
-    interface User {
-      id: number;
-      email: string;
-      domain_id: number;
-      maildir: string;
-    }
-
-    interface Request {
-      session: Session & Partial<SessionData>;
-    }
-  }
-}
-
 declare module 'express-session' {
   interface SessionData {
     user?: {
@@ -24,5 +9,7 @@ declare module 'express-session' {
       maildir: string;
       isAdmin: boolean;
     };
+    pending2faUserId?: number;
+    pendingTwofaSecret?: string;
   }
 }

@@ -10,6 +10,8 @@ import './types/session';
 import authRoutes from './routes/auth';
 import accountRoutes from './routes/account';
 import adminRoutes from './routes/admin';
+import twofaRoutes from './routes/twofa';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -60,6 +62,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/2fa', twofaRoutes);
 
 // Apply rate limiting only to login POST
 app.use('/api/auth/login', loginLimiter);
