@@ -57,33 +57,8 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
     setBackupCodes(res.data.backupCodes);
   };
 
-  const downloadIosProfile = async () => {
-    try {
-      const res = await fetch('/api/account/ios-profile', {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        setMessage('Failed to download iPhone setup profile. Please log out and back in.');
-        return;
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'vasarella-mail.mobileconfig';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      window.URL.revokeObjectURL(url);
-      setMessage('iPhone setup profile downloaded.');
-    } catch {
-      setMessage('Failed to download iPhone setup profile.');
-    }
+  const downloadIosProfile = () => {
+    window.location.href = '/api/account/ios-profile.mobileconfig';
   };
 
   return (

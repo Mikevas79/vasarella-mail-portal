@@ -48,7 +48,7 @@ router.post('/change-password', requireAuth, async (req: Request, res: Response)
   res.json({ message: 'Password changed successfully' });
 });
 
-router.get('/ios-profile', requireAuth, async (req: Request, res: Response) => {
+const iosProfileHandler = async (req: Request, res: Response) => {
   const email = req.session.user!.email;
 
   const profile = {
@@ -90,9 +90,12 @@ router.get('/ios-profile', requireAuth, async (req: Request, res: Response) => {
 
   const xml = plist.build(profile);
 
-  res.type('application/x-apple-aspen-config');
-  res.attachment('vasarella-mail.mobileconfig');
+  res.setHeader('Content-Type', 'application/x-apple-aspen-config');
+  res.setHeader('Content-Disposition', 'inline; filename="vasarella-mail.mobileconfig"');
   res.send(xml);
-});
+};
+
+router.get('/ios-profile', requireAuth, iosProfileHandler);
+router.get('/ios-profile.mobileconfig', requireAuth, iosProfileHandler);
 
 export default router;
