@@ -90,8 +90,8 @@ router.get('/ios-profile', requireAuth, async (req: Request, res: Response) => {
 
   const xml = plist.build(profile);
 
-  res.setHeader('Content-Type', 'application/x-apple-aspen-config');
-  res.setHeader('Content-Disposition', 'attachment; filename="vasarella-mail.mobileconfig"');
+  res.type('application/x-apple-aspen-config');
+  res.attachment('vasarella-mail.mobileconfig');
   res.send(xml);
 });
 
