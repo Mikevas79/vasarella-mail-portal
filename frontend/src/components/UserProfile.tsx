@@ -17,7 +17,7 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
   const [twofaEnabled, setTwofaEnabled] = useState<boolean>((user as any).twofa_enabled || false);
 
   const startSetup = async () => {
-    const res = await axios.post('http://localhost:3001/api/2fa/setup/start', {}, { withCredentials: true });
+    const res = await axios.post('/api/2fa/setup/start', {}, { withCredentials: true });
     setQrCode(res.data.qrCodeDataUrl);
     setSecret(res.data.secret);
     setMessage('');
@@ -26,7 +26,7 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
   const verifySetup = async () => {
     try {
       const res = await axios.post(
-        'http://localhost:3001/api/2fa/setup/verify',
+        '/api/2fa/setup/verify',
         { code },
         { withCredentials: true }
       );
@@ -42,7 +42,7 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
   };
 
   const disable2FA = async () => {
-    await axios.post('http://localhost:3001/api/2fa/disable', {}, { withCredentials: true });
+    await axios.post('/api/2fa/disable', {}, { withCredentials: true });
     setTwofaEnabled(false);
     setBackupCodes([]);
     setMessage('2FA disabled');
@@ -50,7 +50,7 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
 
   const regenerateBackupCodes = async () => {
     const res = await axios.post(
-      'http://localhost:3001/api/2fa/backup-codes/regenerate',
+      '/api/2fa/backup-codes/regenerate',
       {},
       { withCredentials: true }
     );
