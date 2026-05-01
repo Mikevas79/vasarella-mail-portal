@@ -57,8 +57,23 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
     setBackupCodes(res.data.backupCodes);
   };
 
-  const downloadIosProfile = () => {
-    window.location.href = '/api/account/ios-profile.mobileconfig';
+  const downloadIosProfile = async () => {
+    try {
+      const res = await fetch('/api/account/ios-profile-link', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        setMessage('Failed to generate iPhone setup link. Please log out and back in.');
+        return;
+      }
+
+      const data = await res.json();
+      window.location.href = data.url;
+    } catch {
+      setMessage('Failed to generate iPhone setup link.');
+    }
   };
 
   return (
