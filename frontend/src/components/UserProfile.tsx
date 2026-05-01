@@ -73,6 +73,14 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
 
       <h3>Account Security</h3>
 
+      <button
+        onClick={() => {
+          window.location.href = '/api/account/ios-profile';
+        }}
+      >
+        Download iPhone Setup Profile
+      </button>
+
       {!twofaEnabled && !qrCode && (
         <button onClick={startSetup}>Enable 2FA</button>
       )}
