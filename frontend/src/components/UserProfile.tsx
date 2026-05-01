@@ -87,7 +87,20 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
       <button onClick={onLogout} disabled={loading}>
         {loading ? 'Logging out...' : 'Logout'}
       </button>
-
+      
+		<button
+		  type="button"
+		  className="secondary-button"
+		  onClick={() => {
+		    document.getElementById('setup-instructions')?.scrollIntoView({
+		      behavior: 'smooth',
+		      block: 'start',
+		    });
+		  }}
+		>
+		  View Setup Instructions
+		</button>
+		
       <hr />
 
       <h3>Account Security</h3>

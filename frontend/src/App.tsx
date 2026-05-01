@@ -5,6 +5,7 @@ import { LoginForm } from './components/LoginForm'
 import { UserProfile } from './components/UserProfile'
 import { ChangePasswordForm } from './components/ChangePasswordForm'
 import { AdminPanel } from './components/AdminPanel'
+import { SetupInstructions } from './components/SetupInstructions'
 
 function App() {
   const { user, loading, error, requires2fa, login, verify2fa, logout, checkAuth } = useAuth()
@@ -24,6 +25,10 @@ function App() {
           <UserProfile user={user} onLogout={logout} loading={loading} />
           {user.isAdmin && <AdminPanel />}
           <ChangePasswordForm user={user} />
+
+		 <div id="setup-instructions">
+    		<SetupInstructions />
+  		</div>
         </>
       ) : (
         <LoginForm
