@@ -57,6 +57,35 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
     setBackupCodes(res.data.backupCodes);
   };
 
+  const downloadIosProfile = async () => {
+    try {
+      const res = await fetch('/api/account/ios-profile', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        setMessage('Failed to download iPhone setup profile. Please log out and back in.');
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vasarella-mail.mobileconfig';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+      setMessage('iPhone setup profile downloaded.');
+    } catch {
+      setMessage('Failed to download iPhone setup profile.');
+    }
+  };
+
   return (
     <div className="user-profile">
       <h2>Vasarella Mail Portal</h2>
@@ -73,11 +102,7 @@ export function UserProfile({ user, onLogout, loading }: UserProfileProps) {
 
       <h3>Account Security</h3>
 
-      <button
-        onClick={() => {
-          window.location.href = '/api/account/ios-profile';
-        }}
-      >
+      <button onClick={downloadIosProfile}>
         Download iPhone Setup Profile
       </button>
 
