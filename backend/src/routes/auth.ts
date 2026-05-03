@@ -10,7 +10,7 @@ const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',').map(email => email.tri
 
 function sessionUserFromMailUser(user: any) {
   const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
-
+  
   return {
     id: user.id,
     email: user.email,

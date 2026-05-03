@@ -20,7 +20,6 @@ export function AdminPanel() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [active, setActive] = useState(true);
@@ -33,6 +32,7 @@ export function AdminPanel() {
   const loadData = async () => {
     setLoading(true);
     setError(null);
+
     try {
       const [domainsRes, usersRes] = await Promise.all([
         fetch('/api/admin/domains', { credentials: 'include' }),
@@ -70,28 +70,25 @@ export function AdminPanel() {
     }
 
     setSubmitting(true);
+
     try {
       const response = await fetch('/api/admin/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ email, password, active }),
       });
 
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'User created successfully' });
-        setEmail('');
-        setPassword('');
-        setActive(true);
-        // Reload user list
-        loadData();
-      } else {
+      if (!response.ok) {
         const errorData = (await response.json()) as { error: string };
-        const errorMessage = errorData.error || 'Failed to create user';
-        setMessage({ type: 'error', text: errorMessage });
+        throw new Error(errorData.error || 'Failed to create user');
       }
+
+      setMessage({ type: 'success', text: 'User created successfully' });
+      setEmail('');
+      setPassword('');
+      setActive(true);
+      await loadData();
     } catch (err) {
       setMessage({
         type: 'error',
@@ -99,6 +96,73 @@ export function AdminPanel() {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteUser = async (id: number, userEmail: string) => {
+    const confirmed = window.confirm(`Delete mailbox user ${userEmail}? This cannot be undone.`);
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error || 'Failed to delete user');
+      }
+
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+      setMessage({ type: 'success', text: `${userEmail} deleted successfully` });
+    } catch (err) {
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Failed to delete user',
+      });
+    }
+  };
+
+  const handleToggleActive = async (
+    id: number,
+    currentActive: number
+  ) => {
+    try {
+      const response = await fetch(`/api/admin/users/${id}/active`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          active: !currentActive,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+  
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === id
+            ? {
+                ...user,
+                active: currentActive ? 0 : 1,
+              }
+            : user
+        )
+      );
+    } catch (err) {
+      setMessage({
+        type: 'error',
+        text:
+          err instanceof Error
+            ? err.message
+            : 'Failed to update user',
+      });
     }
   };
 
@@ -118,7 +182,6 @@ export function AdminPanel() {
     <div className="admin-panel">
       <h2>Admin Panel</h2>
 
-      {/* Domains List */}
       <div className="admin-section">
         <h3>Available Domains</h3>
         {domains.length > 0 ? (
@@ -132,81 +195,156 @@ export function AdminPanel() {
         )}
       </div>
 
-      {/* Create User Form */}
       <div className="admin-section">
         <h3>Create New Mailbox User</h3>
+
         {message && (
           <div className={`message ${message.type}`}>
             {message.text}
           </div>
         )}
+
         <form onSubmit={handleCreateUser} className="create-user-form">
           <div className="form-group">
             <label htmlFor="email">Email Address:</label>
             <input
               id="email"
               type="email"
+              placeholder="newuser@vasarella.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={submitting}
               required
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="password">Password:</label>
+            <label htmlFor="password">Temporary Password:</label>
             <input
               id="password"
               type="password"
+              placeholder="Minimum 12 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={submitting}
               required
               minLength={12}
             />
-            <small>Minimum 12 characters</small>
+            <small>User should change this password after first login.</small>
           </div>
-          <div className="form-group">
-            <label htmlFor="active">
-              <input
-                id="active"
-                type="checkbox"
-                checked={active}
-                onChange={(e) => setActive(e.target.checked)}
-                disabled={submitting}
-              />
-              Active
-            </label>
-          </div>
+
+          <label className="checkbox-row" htmlFor="active">
+            <input
+              id="active"
+              type="checkbox"
+              checked={active}
+              onChange={(e) => setActive(e.target.checked)}
+              disabled={submitting}
+            />
+            Active
+          </label>
+
           <button type="submit" disabled={submitting}>
             {submitting ? 'Creating...' : 'Create User'}
           </button>
         </form>
       </div>
 
-      {/* Users Table */}
       <div className="admin-section">
         <h3>Existing Mailbox Users</h3>
+
         {users.length > 0 ? (
-          <div className="table-wrapper">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Maildir</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.email}</td>
-                    <td>{user.maildir}</td>
-                    <td>{user.active ? 'Active' : 'Inactive'}</td>
+          <>
+            <div className="desktop-users-table">
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Maildir</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.email}</td>
+                      <td>{user.maildir}</td>
+                      <td>{user.active ? 'Active' : 'Inactive'}</td>
+						<td>
+						  <div className="action-buttons">
+						    <button
+						      type="button"
+						      className={
+						        user.active
+						          ? 'warning-button small-button'
+						          : 'success-button small-button'
+						      }
+						      onClick={() =>
+						        handleToggleActive(user.id, user.active)
+						      }
+						    >
+						      {user.active ? 'Disable' : 'Enable'}
+						    </button>
+
+						    <button
+						      type="button"
+						      className="danger-button small-button"
+						      onClick={() =>
+						        handleDeleteUser(user.id, user.email)
+						      }
+						    >
+						      Delete
+						    </button>
+						  </div>
+						</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mobile-users-list">
+              {users.map((user) => (
+                <div className="mail-user-card" key={user.id}>
+                  <div>
+                    <strong>{user.email}</strong>
+                    <p>{user.maildir}</p>
+                    <span className={user.active ? 'status-pill active' : 'status-pill inactive'}>
+                      {user.active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+
+					<div className="action-buttons vertical-actions">
+					  <button
+					    type="button"
+					    className={
+					      user.active
+					        ? 'warning-button small-button'
+					        : 'success-button small-button'
+					    }
+					    onClick={() =>
+					      handleToggleActive(user.id, user.active)
+					    }
+					  >
+					    {user.active ? 'Disable' : 'Enable'}
+					  </button>
+
+					  <button
+					    type="button"
+					    className="danger-button small-button"
+					    onClick={() =>
+					      handleDeleteUser(user.id, user.email)
+					    }
+					  >
+					    Delete
+					  </button>
+					</div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <p>No mailbox users found</p>
         )}

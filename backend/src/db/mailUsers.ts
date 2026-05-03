@@ -95,6 +95,29 @@ export async function createMailUser(email: string, password: string, active: bo
   };
 }
 
+export async function setMailUserActive(
+  id: number,
+  active: boolean
+): Promise<boolean> {
+  const [result] = await pool.execute(
+    'UPDATE users SET active = ? WHERE id = ?',
+    [active ? 1 : 0, id]
+  );
+
+  const info = result as { affectedRows?: number };
+  return !!info.affectedRows;
+}
+
+export async function deleteMailUser(id: number): Promise<boolean> {
+  const [result] = await pool.execute(
+    'DELETE FROM users WHERE id = ?',
+    [id]
+  );
+
+  const info = result as { affectedRows?: number };
+  return !!info.affectedRows;
+}
+
 export function mailUserWithoutPassword(user: MailUser): PublicMailUser {
   const { password, ...publicUser } = user;
   return publicUser;

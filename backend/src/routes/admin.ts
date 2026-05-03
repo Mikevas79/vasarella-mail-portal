@@ -1,7 +1,13 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { requireAdmin } from '../middleware/admin';
-import { getActiveDomains, getAllUsers, createMailUser } from '../db/mailUsers';
+import {
+  getActiveDomains,
+  getAllUsers,
+  createMailUser,
+  setMailUserActive,
+  deleteMailUser,
+} from '../db/mailUsers';
 
 const router = Router();
 
@@ -61,6 +67,51 @@ router.post('/users', async (req: Request, res: Response) => {
     }
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// PATCH /api/admin/users/:id/active
+router.patch('/users/:id/active', async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { active } = req.body;
+
+  if (!id || Number.isNaN(id)) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+
+  try {
+    const updated = await setMailUserActive(id, !!active);
+
+    if (!updated) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating user active status:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// DELETE /api/admin/users/:id
+router.delete('/users/:id', async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (!id || Number.isNaN(id)) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+
+  try {
+    const deleted = await deleteMailUser(id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 

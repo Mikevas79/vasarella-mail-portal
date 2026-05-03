@@ -39,7 +39,7 @@ export function LoginForm({ onLogin, onVerify2fa, requires2fa, loading, error }:
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="test@vasarella.com"
+              placeholder="youremail@vasarella.com"
               disabled={loading}
               required
             />

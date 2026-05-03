@@ -6,7 +6,7 @@ export function SetupInstructions() {
       <div className="setup-grid">
 
         <div className="setup-item">
-          <h4>📱 iPhone / iPad</h4>
+          <h4>📱 iPhone / iPad (Apple Mail app)</h4>
           <ol>
             <li>Tap “Download iPhone Setup Profile”</li>
             <li>Tap Allow</li>

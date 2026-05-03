@@ -1,0 +1,55 @@
+.
+├── README.md
+├── backend
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   ├── app.ts
+│   │   ├── config
+│   │   │   └── database.ts
+│   │   ├── db
+│   │   │   └── mailUsers.ts
+│   │   ├── middleware
+│   │   │   └── admin.ts
+│   │   ├── mocks
+│   │   │   └── users.ts
+│   │   ├── routes
+│   │   │   ├── account.ts
+│   │   │   ├── admin.ts
+│   │   │   ├── auth.ts
+│   │   │   └── twofa.ts
+│   │   ├── types
+│   │   │   ├── mailUser.ts
+│   │   │   ├── plist.d.ts
+│   │   │   ├── session.ts
+│   │   │   └── unix-crypt-td-js.d.ts
+│   │   └── utils
+│   │       └── verifyDovecotPassword.ts
+│   └── tsconfig.json
+├── dev.code-workspace
+├── frontend
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   └── favicon.svg
+│   ├── src
+│   │   ├── App.tsx
+│   │   ├── components
+│   │   │   ├── AdminPanel.tsx
+│   │   │   ├── ChangePasswordForm.tsx
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── SetupInstructions.tsx
+│   │   │   └── UserProfile.tsx
+│   │   ├── hooks
+│   │   │   └── useAuth.ts
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── types
+│   │       └── auth.ts
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+└── structure.txt
+
+16 directories, 37 files
